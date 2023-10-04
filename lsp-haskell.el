@@ -1,7 +1,7 @@
 ;;; lsp-haskell.el --- Haskell support for lsp-mode
 
 ;; Version: 1.1
-;; Package-Requires: ((emacs "27.1") (lsp-mode "3.0") (haskell-mode "16.1"))
+;; Package-Requires: ((emacs "27.1") (lsp-mode "3.0"))
 ;; Keywords: haskell
 ;; URL: https://github.com/emacs-lsp/lsp-haskell
 
@@ -29,7 +29,6 @@
 ;;; Code:
 
 (require 'lsp-mode)
-(require 'haskell-mode)
 
 ;; ---------------------------------------------------------------------
 ;; Configuration
@@ -488,30 +487,32 @@ and `lsp-haskell-server-args' and `lsp-haskell-server-wrapper-function'."
 ;; it there, then delete it from here.
 ;; It also isn't *too* important: it only sets the language ID, see
 ;; https://microsoft.github.io/language-server-protocol/specification#textDocumentItem
-(add-to-list 'lsp-language-id-configuration '(haskell-literate-mode . "haskell"))
-(add-to-list 'lsp-language-id-configuration '(haskell-tng-mode . "haskell"))
-(add-to-list 'lsp-language-id-configuration '(haskell-cabal-mode . "haskell"))
+;; (add-to-list 'lsp-language-id-configuration '(haskell-literate-mode . "haskell"))
+;; (add-to-list 'lsp-language-id-configuration '(haskell-tng-mode . "haskell"))
+;; (add-to-list 'lsp-language-id-configuration '(haskell-cabal-mode . "haskell"))
+(add-to-list 'lsp-language-id-configuration '(haskell-ng-mode . "haskell"))
 
 ;; Register the client itself
 (lsp-register-client
-  (make-lsp--client
-    :new-connection (lsp-stdio-connection (lambda () (lsp-haskell--server-command)))
-    ;; Should run under haskell-mode, haskell-literate-mode and haskell-tng-mode. We need to list haskell-literate-mode even though it's a derived mode of haskell-mode.
-    :major-modes '(haskell-mode haskell-literate-mode haskell-tng-mode haskell-cabal-mode)
-    ;; This is arbitrary.
-    :server-id 'lsp-haskell
-    ;; HLS does not currently send 'workspace/configuration' on startup (https://github.com/haskell/haskell-language-server/issues/2762),
-    ;; so we need to push the configuration to it manually on startup. We should be able to
-    ;; get rid of this once the issue is fixed in HLS.
-    :initialized-fn (lambda (workspace)
-                      (with-lsp-workspace workspace
-                        (lsp--set-configuration (lsp-configuration-section "haskell"))))
-    :synchronize-sections '("haskell")
-    ;; This is somewhat irrelevant, but it is listed in lsp-language-id-configuration, so
-    ;; we should set something consistent here.
-    :language-id "haskell"
-    :completion-in-comments? lsp-haskell-completion-in-comments
-    ))
+ (make-lsp--client
+  :new-connection (lsp-stdio-connection (lambda () (lsp-haskell--server-command)))
+  ;; Should run under haskell-mode, haskell-literate-mode and haskell-tng-mode. We need to list haskell-literate-mode even though it's a derived mode of haskell-mode.
+  ;; :major-modes '(haskell-mode haskell-literate-mode haskell-tng-mode haskell-cabal-mode)
+  :major-modes '(haskell-ng-mode)
+  ;; This is arbitrary.
+  :server-id 'lsp-haskell
+  ;; HLS does not currently send 'workspace/configuration' on startup (https://github.com/haskell/haskell-language-server/issues/2762),
+  ;; so we need to push the configuration to it manually on startup. We should be able to
+  ;; get rid of this once the issue is fixed in HLS.
+  :initialized-fn (lambda (workspace)
+                    (with-lsp-workspace workspace
+                      (lsp--set-configuration (lsp-configuration-section "haskell"))))
+  :synchronize-sections '("haskell")
+  ;; This is somewhat irrelevant, but it is listed in lsp-language-id-configuration, so
+  ;; we should set something consistent here.
+  :language-id "haskell"
+  :completion-in-comments? lsp-haskell-completion-in-comments
+  ))
 
 ;; ---------------------------------------------------------------------
 
