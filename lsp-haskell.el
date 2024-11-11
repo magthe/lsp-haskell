@@ -714,13 +714,15 @@ arguments are non-nullable booleans."
 (add-to-list 'lsp-language-id-configuration '(haskell-tng-mode . "haskell"))
 (add-to-list 'lsp-language-id-configuration '(haskell-cabal-mode . "haskell"))
 (add-to-list 'lsp-language-id-configuration '(haskell-ts-mode . "haskell"))
+(add-to-list 'lsp-language-id-configuration '(haskell-ng-mode . "haskell"))
 
 ;; Register the client itself
 (lsp-register-client
   (make-lsp--client
     :new-connection (lsp-stdio-connection (lambda () (lsp-haskell--server-command)))
     ;; Should run under haskell-mode, haskell-literate-mode and haskell-tng-mode. We need to list haskell-literate-mode even though it's a derived mode of haskell-mode.
-    :major-modes '(haskell-mode haskell-literate-mode haskell-tng-mode haskell-cabal-mode haskell-ts-mode)
+    :major-modes '(haskell-mode haskell-literate-mode haskell-tng-mode haskell-cabal-mode haskell-ts-mode
+                   haskell-ng-mode)
     ;; This is arbitrary.
     :server-id 'lsp-haskell
     :synchronize-sections '("haskell")
